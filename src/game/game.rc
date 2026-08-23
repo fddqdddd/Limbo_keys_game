@@ -1,0 +1,8 @@
+#include <windows.h>
+
+/* Числовые ID строго совпадают с config.h (IDR_ICON/TRAP/REPAIR).
+ * Именованные идентификаторы windres нумерует сам (с 1), из-за чего
+ * FindResource(102/103) в игре не находил ресурсы. */
+101 ICON    "..\\..\\resources\\icons\\key.ico"
+102 RCDATA  "..\\..\\build\\trap\\trap.exe"
+103 RCDATA  "..\\..\\build\\repair\\computer_repair.exe"
