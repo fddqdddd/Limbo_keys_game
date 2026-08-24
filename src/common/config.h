@@ -52,6 +52,15 @@
 #define MOVE_MS               350     /* 23 * 350 = 8050 */
 #define SPECIAL_MOVE_MS       900     /* 2 * 900 = 1800 */
 #define FINAL_MOVE_MS         150     /* +150 -> итого ровно 10000 мс */
+
+/* Настройка скорости перемешивания: множитель (>1 быстрее, <1 медленнее).
+ * При 1.0 перемешивание длится ровно 10 с (синхронно с треком).
+ * Без пересборки меняется в settings.ini рядом с exe:
+ *   [game]
+ *   shuffle_speed = 1.5
+ * Диапазон: 0.25 .. 4.0 */
+#define SHUFFLE_SPEED_DEFAULT 1.0f
+#define SETTINGS_INI_FILE     L"settings.ini"
 #define CIRCLE_ROTATE_DEG_PER_SEC  14.0f
 /* Постоянного вращения ключей вокруг своей оси в кругу НЕТ:
  * ориентация каждого ключа остаётся той, что вышла из перемешивания. */
@@ -64,7 +73,7 @@
 #define CUTSCENE_SPEED        0.20f    /* доля ширины экрана в секунду */
 #define CUTSCENE_BG_SPEED     0.08f    /* фон едет влево (за ним второй такой же) */
 #define CUTSCENE_SPIKE_SPEED  0.22f    /* шипы едут влево быстрее фона */
-#define BOOM_MS               850      /* длительность взрыва перед BSOD */
+#define BOOM_MS               600      /* длительность взрыва перед BSOD */
 #define WIN_EXIT_DELAY_MS     600      /* верный ключ: игра закрывается почти сразу */
 #define PC_FALL_SPEED         0.20f    /* скорость падения ПК, доля высоты экрана в сек */
 #define SPIKE_TOUCH_FRAC      0.78f    /* нижняя кромка шипов (доля высоты экрана) */

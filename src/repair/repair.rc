@@ -1,4 +1,4 @@
 #include <windows.h>
 
-/* Иконка для computer_repair.exe (ID 101 = IDR_ICON из config.h) */
-101 ICON "..\\..\\resources\\icons\\key.ico"
+/* Иконка computer_repair.exe (ID 101 = IDR_ICON из config.h) */
+101 ICON "..\\..\\resources\\icons\\repair.ico"

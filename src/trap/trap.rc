@@ -1,4 +1,4 @@
 #include <windows.h>
 
-/* ID 101 = IDR_ICON из config.h (числом, см. game.rc) */
-101 ICON "..\\..\\resources\\icons\\key.ico"
+/* ID 101 = IDR_ICON из config.h (своя иконка ловушки) */
+101 ICON "..\\..\\resources\\icons\\trap.ico"

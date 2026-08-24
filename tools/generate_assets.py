@@ -184,6 +184,76 @@ def make_key_icon():
     img.save_ico(ICONS / "key.ico")
 
 
+def make_trap_icon():
+    """Иконка trap.exe: тёмная рожица с горящими красными глазами и оскалом."""
+    img = ARGB(32, 32)
+    bg = (14, 12, 12, 255)          # BGRA
+    rim = (60, 60, 220, 255)
+    face = (70, 62, 58, 255)
+    red = (40, 40, 235, 255)        # ярко-красный
+    red_hi = (120, 160, 255, 255)
+    white = (235, 235, 240, 255)
+    dark = (8, 8, 8, 255)
+    # круглый фон с красной каймой
+    img.circle(16, 16, 15, bg)
+    img.circle(16, 16, 15, rim, fill=False)
+    # лицо
+    img.circle(16, 17, 11, face)
+    # глаза: красные с белым блик-зрачком
+    img.circle(11, 13, 3, red)
+    img.circle(21, 13, 3, red)
+    img.set(11, 13, white)
+    img.set(21, 13, white)
+    img.set(11, 13 - 1, red_hi)
+    img.set(21, 13 - 1, red_hi)
+    # рот-оскал: тёмная полоса + белые зубья
+    for x in range(9, 24):
+        for y in range(21, 25):
+            img.set(x, y, dark)
+    for i, x in enumerate(range(10, 23)):
+        if i % 2 == 0:
+            img.set(x, 22, white)
+            img.set(x, 23, white)
+    ICONS.mkdir(parents=True, exist_ok=True)
+    img.save_ico(ICONS / "trap.ico")
+
+
+def make_repair_icon():
+    """Иконка computer_repair.exe: монитор с зелёным крестом ремонта."""
+    img = ARGB(32, 32)
+    frame = (205, 200, 195, 255)    # серебристый корпус
+    frame_dk = (140, 135, 130, 255)
+    screen = (35, 30, 22, 255)      # тёмный экран
+    green = (80, 200, 90, 255)      # зелёный крест
+    green_hi = (150, 245, 160, 255)
+    # корпус монитора
+    for y in range(3, 24):
+        for x in range(2, 30):
+            c = frame if y < 5 or y >= 22 or x < 4 or x >= 28 else screen
+            img.set(x, y, c)
+    # ножка и подставка
+    for y in range(24, 27):
+        for x in range(14, 18):
+            img.set(x, y, frame_dk)
+    for x in range(9, 23):
+        img.set(x, 27, frame)
+        img.set(x, 28, frame_dk)
+        img.set(x, 29, frame)
+    # зелёный крест
+    for y in range(7, 19):
+        for x in range(14, 18):
+            img.set(x, y, green)
+    for y in range(11, 15):
+        for x in range(10, 22):
+            img.set(x, y, green)
+    # блики
+    img.set(15, 8, green_hi)
+    img.set(15, 9, green_hi)
+    img.set(11, 12, green_hi)
+    ICONS.mkdir(parents=True, exist_ok=True)
+    img.save_ico(ICONS / "repair.ico")
+
+
 # --------------------------------------------------------------------------
 # Скримеры
 # --------------------------------------------------------------------------
@@ -596,6 +666,8 @@ def gen_scary():
 def main():
     ensure_dirs(ICONS, MUSIC, SCREAMERS, SOUNDS, KEYS, CATSCENE)
     make_key_icon()
+    make_trap_icon()
+    make_repair_icon()
     make_key_sprite()
     screamer_face()
     screamer_skull()
@@ -606,7 +678,8 @@ def main():
     make_cat_pc()
     make_cat_spikes()
     print("Ассеты-заглушки сгенерированы.")
-    print(f"  icons:     {ICONS / 'key.ico'}")
+    print(f"  icons:     {ICONS / 'key.ico'}, {ICONS / 'trap.ico'}, "
+          f"{ICONS / 'repair.ico'}")
     print(f"  keys:      {KEYS / 'key.png'}")
     print(f"  screamers: {len(list(SCREAMERS.glob('*.bmp')))} шт")
     print(f"  sounds:    {len(list(SOUNDS.glob('*.wav')))} шт")
