@@ -81,6 +81,7 @@ static float g_csX = 0, g_csY = 0, g_csRot = 0;
 static float g_bgScroll = 0, g_spScroll = 0;   /* скролл катсцены влево */
 static bool  g_boom = false;                   /* взрыв при неверном ключе */
 static ULONGLONG g_boomStart = 0;
+static float g_shuffleSpeed = SHUFFLE_SPEED_DEFAULT;  /* из settings.ini */
 static bool g_csFallen = false;
 static ULONGLONG g_csFallStart = 0;
 static ULONGLONG g_csExitAt = 0;
@@ -270,9 +271,9 @@ static int patternForMove(int i) {
 }
 
 static DWORD moveDur(int i) {
-    if (i == 25) return FINAL_MOVE_MS;
-    if (i == 5 || i == 12) return SPECIAL_MOVE_MS;
-    return MOVE_MS;
+    DWORD base = (i == 25) ? FINAL_MOVE_MS
+               : (i == 5 || i == 12) ? (DWORD)SPECIAL_MOVE_MS : (DWORD)MOVE_MS;
+    return (DWORD)(base / g_shuffleSpeed + 0.5f);
 }
 
 static void beginMove(int i) {
@@ -286,7 +287,7 @@ static void beginMove(int i) {
             /* блок-свап: ключи идут по дуге (верхний блок по часовой,
              * нижний — против) и поворачиваются на 180°. */
             int dir = (K.slot <= 4) ? 1 : -1;
-            animKeyArc(K, (float)px, (float)py, SPECIAL_MOVE_MS, dir);
+            animKeyArc(K, (float)px, (float)py, moveDur(i), dir);
         } else {
             animKey(K, (float)px, (float)py, moveDur(i));
         }
@@ -1081,9 +1082,11 @@ static void game_tick() {
         g_spScroll += CUTSCENE_SPIKE_SPEED * g_W * dt / 1000.0f;
         g_csX += (float)CUTSCENE_SPEED * g_W * dt / 1000.0f;
         if (g_csX > g_W + g_pcDW / 2 + 40) {
-            /* верный ключ: компьютер спокойно проехал по шипам — закрываемся */
-            if (g_csExitAt == 0) g_csExitAt = g_now + WIN_EXIT_DELAY_MS;
-            else if (g_now > g_csExitAt) start_phase(PH_EXIT);
+            /* верный ключ: катсцена закончилась — диспетчер задач возвращается */
+            if (g_csExitAt == 0) {
+                guard_stop();
+                g_csExitAt = g_now + WIN_EXIT_DELAY_MS;
+            } else if (g_now > g_csExitAt) start_phase(PH_EXIT);
         }
         break;
     }
@@ -1317,6 +1320,17 @@ static void log_init_fail(const char *step) {
     util::write_file(util::join(tmp, L"limbo_init_err.txt"), buf, strlen(buf));
 }
 
+/* Настройки из settings.ini рядом с exe: [game] shuffle_speed */
+static void load_settings() {
+    wstring ini = util::join(util::app_dir(), SETTINGS_INI_FILE);
+    wchar_t buf[64] = L"";
+    if (GetPrivateProfileStringW(L"game", L"shuffle_speed", L"", buf, 64,
+                                 ini.c_str()) > 0) {
+        float v = (float)wcstod(buf, NULL);
+        if (v >= 0.25f && v <= 4.0f) g_shuffleSpeed = v;
+    }
+}
+
 int WINAPI WinMain(HINSTANCE hinst, HINSTANCE, LPSTR, int) {
     g_hinst = hinst;
     srand((unsigned)GetTickCount());
@@ -1343,6 +1357,7 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE, LPSTR, int) {
     }
 
     init_fonts();
+    load_settings();
     init_sprites();
     init_catscene();
 
