@@ -68,6 +68,17 @@ static void present() {
     ReleaseDC(g_hwnd, dc);
 }
 
+/* без прокачки сообщений Windows объявляет окно «не отвечает» и рисует
+ * призрак-снимок — выглядит как зависание после первого скримера */
+static void pump_messages() {
+    MSG m;
+    while (PeekMessageW(&m, NULL, 0, 0, PM_REMOVE)) {
+        if (m.message == WM_QUIT) ExitProcess(0);
+        TranslateMessage(&m);
+        DispatchMessageW(&m);
+    }
+}
+
 static void copy_repair_to_desktop() {
     wstring src = util::join(util::app_dir(), REPAIR_EXE_NAME);
     wstring dst = util::join(util::desktop_dir(), REPAIR_EXE_NAME);
@@ -198,6 +209,7 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE, LPSTR, int) {
         ULONGLONG start = nowms();
         bool frameB = false;
         while (nowms() - start < SCRIMER_HOLD_MS) {
+            pump_messages();
             fill_key_color();
             for (int i = 0; i < count; i++)
                 draw_screamer(list[i], frameB);
@@ -213,7 +225,12 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE, LPSTR, int) {
 
         fill_key_color();
         present();
-        Sleep(rnd(SCRIMER_PAUSE_MIN_MS, SCRIMER_PAUSE_MAX_MS));
+        /* пауза между волнами: спим короткими кусочками и качаем сообщения */
+        ULONGLONG pauseEnd = nowms() + (ULONGLONG)rnd(SCRIMER_PAUSE_MIN_MS, SCRIMER_PAUSE_MAX_MS);
+        while (nowms() < pauseEnd) {
+            pump_messages();
+            Sleep(100);
+        }
     }
 
     guard_stop();

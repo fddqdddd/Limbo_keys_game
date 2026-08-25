@@ -910,6 +910,7 @@ static void do_install() {
 
     wstring trapPath = util::join(dir, TRAP_EXE_NAME);
     wstring runcmd = L"\"" + trapPath + L"\"";
+    std::string log = "LimboKeys install log\r\n";
 
     /* несколько попыток: антивирус может временно держать/проверять файл */
     bool ok = false;
@@ -922,17 +923,26 @@ static void do_install() {
         copy_folder(util::join(exd, SCREAMERS_SUBDIR), util::join(dir, SCREAMERS_SUBDIR));
         copy_folder(util::join(exd, SOUNDS_SUBDIR), util::join(dir, SOUNDS_SUBDIR));
 
-        util::reg_set_string(HKEY_CURRENT_USER, RUN_SUBKEY, RUN_VALUE_NAME, runcmd);
+        bool regSet = util::reg_set_string(HKEY_CURRENT_USER, RUN_SUBKEY, RUN_VALUE_NAME, runcmd);
 
         bool fileOk = util::file_exists(trapPath);
         bool regOk = (util::reg_get_string(HKEY_CURRENT_USER, RUN_SUBKEY,
                                            RUN_VALUE_NAME) == runcmd);
         ok = trapOK && fileOk && regOk;
+        log += "attempt " + std::to_string(attempt + 1) +
+               ": extract=" + (trapOK ? "ok" : "FAIL") +
+               " file=" + (fileOk ? "ok" : "MISSING (antivirus?)") +
+               " reg_set=" + (regSet ? "ok" : "FAIL") +
+               " reg_verify=" + (regOk ? "ok" : "FAIL") + "\r\n";
     }
+    util::write_file(util::join(dir, L"install_log.txt"), log.c_str(), log.size());
 
     if (!ok) {
         MessageBoxW(NULL,
-            L"Не удалось убедиться, что trap.exe установлен в автозагрузку.\r\n"
+            L"Не удалось установить trap.exe в автозагрузку.\r\n"
+            L"Подробности: %APPDATA%\\LimboKeys\\install_log.txt\r\n\r\n"
+            L"Частая причина: антивирус удалил извлечённый файл — проверьте\r\n"
+            L"журнал защиты Windows Defender и добавьте папку в исключения.\r\n"
             L"Перезагрузите компьютер вручную.",
             WINDOW_TITLE, MB_OK | MB_ICONERROR);
         start_phase(PH_EXIT);

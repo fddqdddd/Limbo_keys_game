@@ -59,7 +59,7 @@
  *   [game]
  *   shuffle_speed = 1.5
  * Диапазон: 0.25 .. 4.0 */
-#define SHUFFLE_SPEED_DEFAULT 1.0f
+#define SHUFFLE_SPEED_DEFAULT 3.0f
 #define SETTINGS_INI_FILE     L"settings.ini"
 #define CIRCLE_ROTATE_DEG_PER_SEC  14.0f
 /* Постоянного вращения ключей вокруг своей оси в кругу НЕТ:
@@ -67,7 +67,7 @@
 #define SCRIMER_HOLD_MS       1000
 #define SCRIMER_FLICKER_MS    120
 #define SCRIMER_PAUSE_MIN_MS  2000
-#define SCRIMER_PAUSE_MAX_MS  8000
+#define SCRIMER_PAUSE_MAX_MS  4000
 #define SCRIMER_COUNT_MIN     1        /* скримеров за раз (может быть несколько) */
 #define SCRIMER_COUNT_MAX     3
 #define CUTSCENE_SPEED        0.20f    /* доля ширины экрана в секунду */
