@@ -3,7 +3,7 @@
  * чистый C++, без движка).
  *
  * Фазы: спавн ключей (сетка 2x4) -> мигание верного ключа ЗЕЛЁНЫМ ->
- * 26 ходов перемешивания (курсор спрятан; после каждого хода ключи
+ * 38 ходов перемешивания (курсор спрятан; после каждого хода ключи
  * «нормальные», без наклона) -> круг (вращение кольца + очень быстрое
  * вращение каждого ключа вокруг оси, наведение увеличивает ключ и показывает
  * «руку») -> клик мышью -> катсцена «компьютер и шипы» (фон background.png,
@@ -263,16 +263,16 @@ static const int STEP_MAP[21][8] = {
 
 static int patternForMove(int i) {
     if (i == 5)  return 18;   /* первый блок-свап: разворот на 180° */
-    if (i == 12) return 19;   /* второй блок-свап: через ~3 с после первого */
-    if (i == 25) return 20;
+    if (i == 15) return 19;   /* второй блок-свап: через ~3 с после первого */
+    if (i == 37) return 20;
     int pick = rand() % 16;
     if (pick <= 7) return pick;
     return 10 + (pick - 8);
 }
 
 static DWORD moveDur(int i) {
-    DWORD base = (i == 25) ? FINAL_MOVE_MS
-               : (i == 5 || i == 12) ? (DWORD)SPECIAL_MOVE_MS : (DWORD)MOVE_MS;
+    DWORD base = (i == 37) ? FINAL_MOVE_MS
+               : (i == 5 || i == 15) ? (DWORD)SPECIAL_MOVE_MS : (DWORD)MOVE_MS;
     return (DWORD)(base / g_shuffleSpeed + 0.5f);
 }
 
@@ -283,7 +283,7 @@ static void beginMove(int i) {
         int newSlot = STEP_MAP[pat][K.slot - 1];
         int px, py;
         slotXY(newSlot, &px, &py);
-        if (i == 5 || i == 12) {
+        if (i == 5 || i == 15) {
             /* блок-свап: ключи идут по дуге (верхний блок по часовой,
              * нижний — против) и поворачиваются на 180°. */
             int dir = (K.slot <= 4) ? 1 : -1;
@@ -1006,7 +1006,7 @@ static void game_tick() {
             if (g_keys[i].animating) busy = true;
         }
         if (!busy) {
-            if (g_moveIndex < 26) {
+            if (g_moveIndex < 38) {
                 beginMove(g_moveIndex++);
             } else {
                 for (int i = 0; i < KEY_COUNT; i++) {
